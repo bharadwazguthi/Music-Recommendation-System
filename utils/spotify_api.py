@@ -32,14 +32,31 @@ def get_spotify_recommendations(song_name):
         return [], "Spotify API not initialized."
 
     try:
+        # Search for track
         search_results = sp.search(q=song_name, type='track', limit=1)
         if not search_results['tracks']['items']:
             return [], "Song not found on Spotify."
 
         track = search_results['tracks']['items'][0]
         track_id = track['id']
+        artist_id = track['artists'][0]['id']
+        st.write("✅ Found Track:", track['name'])
+        st.write("🎯 Track ID:", track_id)
+        st.write("🎤 Artist ID:", artist_id)
 
-        recs = sp.recommendations(seed_tracks=[track_id], limit=10)
+        # Attempt recommendation using track
+        try:
+            recs = sp.recommendations(seed_tracks=[track_id], limit=10)
+            st.write("✅ Track-based recommendations fetched.")
+        except Exception as track_err:
+            st.warning("⚠️ Track-based recommendations failed. Trying artist-based...")
+            st.exception(track_err)
+            # Fall back to artist-based recommendations
+            recs = sp.recommendations(seed_artists=[artist_id], limit=10)
+            st.write("✅ Artist-based recommendations fetched.")
+
+        if not recs['tracks']:
+            return [], "No recommendations returned."
 
         recommendations = [{
             'title': t['name'],
@@ -49,5 +66,8 @@ def get_spotify_recommendations(song_name):
         } for t in recs['tracks']]
 
         return recommendations, None
+
     except Exception as e:
+        st.error("❌ Failed to fetch Spotify recommendations.")
+        st.exception(e)
         return [], f"Error: {e}"

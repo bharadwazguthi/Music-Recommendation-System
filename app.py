@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import time
 import streamlit.components.v1 as components
-from utils import spotify_api.get_spotify_recommendations
+from utils import spotify_api
 
 # Page config
 st.set_page_config(page_title="Spotify Music Recommender", page_icon="🎵", layout="wide")

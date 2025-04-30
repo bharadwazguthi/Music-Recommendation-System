@@ -2,15 +2,14 @@ import streamlit as st
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
-# Make sure your Streamlit app URL is added in Spotify dashboard as redirect URI
-REDIRECT_URI = "https://your-app-name.streamlit.app"
+REDIRECT_URI = "https://music-rs.streamlit.app"
 
 @st.cache_resource
 def initialize_spotify():
     try:
         auth_manager = SpotifyOAuth(
-            client_id="aed05b133c93407c85a371de0c1b3ec4",
-            client_secret="272d835ea2184f4196c2911f4ecb747a",
+            client_id="a991f60a350e4f3fa4b40d3f47059f75",
+            client_secret="d5a01f68d36144a09a0383d30d640343",
             redirect_uri=REDIRECT_URI,
             scope="user-read-private"
         )

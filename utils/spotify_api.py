@@ -1,16 +1,18 @@
 import streamlit as st
 import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
+from spotipy.oauth2 import SpotifyOAuth
+
+# Make sure your Streamlit app URL is added in Spotify dashboard as redirect URI
+REDIRECT_URI = "https://your-app-name.streamlit.app"
 
 @st.cache_resource
 def initialize_spotify():
     try:
-        # Directly use your credentials (remove all st.secrets references)
-        client_id = "aed05b133c93407c85a371de0c1b3ec4"
-        client_secret = "272d835ea2184f4196c2911f4ecb747a"
-        auth_manager = SpotifyClientCredentials(
-            client_id=client_id,
-            client_secret=client_secret
+        auth_manager = SpotifyOAuth(
+            client_id="aed05b133c93407c85a371de0c1b3ec4",
+            client_secret="272d835ea2184f4196c2911f4ecb747a",
+            redirect_uri=REDIRECT_URI,
+            scope="user-read-private"
         )
         return spotipy.Spotify(auth_manager=auth_manager)
     except Exception as e:
@@ -29,7 +31,6 @@ def get_spotify_recommendations(song_name):
             return [], "Song not found on Spotify."
         
         track = results['tracks']['items'][0]
-        artist_id = track['artists'][0]['id']
 
         recommendations = spotify.recommendations(seed_tracks=[track['id']], limit=10)
 

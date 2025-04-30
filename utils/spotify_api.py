@@ -32,7 +32,7 @@ def get_spotify_recommendations(song_name):
         return [], "Spotify API not initialized."
 
     try:
-        # Search for track
+        # Search track
         search_results = sp.search(q=song_name, type='track', limit=1)
         if not search_results['tracks']['items']:
             return [], "Song not found on Spotify."
@@ -44,16 +44,26 @@ def get_spotify_recommendations(song_name):
         st.write("🎯 Track ID:", track_id)
         st.write("🎤 Artist ID:", artist_id)
 
-        # Attempt recommendation using track
+        # Try seed_tracks
         try:
             recs = sp.recommendations(seed_tracks=[track_id], limit=10)
-            st.write("✅ Track-based recommendations fetched.")
-        except Exception as track_err:
-            st.warning("⚠️ Track-based recommendations failed. Trying artist-based...")
-            st.exception(track_err)
-            # Fall back to artist-based recommendations
-            recs = sp.recommendations(seed_artists=[artist_id], limit=10)
-            st.write("✅ Artist-based recommendations fetched.")
+            st.success("✅ Track-based recommendations fetched.")
+        except Exception as e1:
+            st.warning("⚠️ Track-based failed, trying artist...")
+            st.exception(e1)
+            try:
+                recs = sp.recommendations(seed_artists=[artist_id], limit=10)
+                st.success("✅ Artist-based recommendations fetched.")
+            except Exception as e2:
+                st.warning("⚠️ Artist-based failed, trying genre...")
+                st.exception(e2)
+                try:
+                    recs = sp.recommendations(seed_genres=["pop"], limit=10)
+                    st.success("✅ Genre-based recommendations fetched.")
+                except Exception as e3:
+                    st.error("❌ All recommendation methods failed.")
+                    st.exception(e3)
+                    return [], f"Error: {e3}"
 
         if not recs['tracks']:
             return [], "No recommendations returned."

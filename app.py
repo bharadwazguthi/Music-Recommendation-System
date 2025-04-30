@@ -1,15 +1,12 @@
 import streamlit as st
-from utils.spotify_api import get_spotify_recommendations, initialize_spotify
 import pandas as pd
-import streamlit.components.v1 as components
 import time
+import streamlit.components.v1 as components
+from spotify_api import get_spotify_recommendations
 
 # Page config
 st.set_page_config(page_title="Spotify Music Recommender", page_icon="🎵", layout="wide")
 st.title("🎵 Spotify Music Recommendation System")
-
-# Initialize Spotify
-spotify = initialize_spotify()
 
 # Loading spinner
 def custom_loading_spinner():

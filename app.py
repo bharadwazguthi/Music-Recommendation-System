@@ -1,8 +1,7 @@
 import streamlit as st
-from utils.spotify_api import get_spotify_recommendations
 import pandas as pd
 import time
-import streamlit.components.v1 as components
+from utils.spotify_api import get_spotify_recommendations
 
 # Page config
 st.set_page_config(page_title="Spotify Music Recommender", page_icon="🎵", layout="wide")
@@ -15,9 +14,9 @@ def custom_loading_spinner():
         <div class="music-note">🎵</div>
     </div>
     """
-    components.html(spinner_html, height=150)
+    st.markdown(spinner_html, unsafe_allow_html=True)
 
-# UI for input
+# UI
 song_name = st.text_input("Enter a song name:")
 
 # Buttons
@@ -37,7 +36,7 @@ if search_button and song_name:
     spotify_recs, error = get_spotify_recommendations(song_name)
     
     if error:
-        st.error(error)
+        st.error(f"Error: {error}")
     elif not spotify_recs:
         st.warning("No recommendations found.")
     else:
@@ -51,7 +50,7 @@ if search_button and song_name:
                 </div>
             """, unsafe_allow_html=True)
 
-        # Download button for recommendations as CSV
+        # Download button
         df = pd.DataFrame(spotify_recs)
         csv = df.to_csv(index=False).encode('utf-8')
 

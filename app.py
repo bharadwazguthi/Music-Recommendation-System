@@ -1,5 +1,5 @@
 import streamlit as st
-from spotify_api import get_spotify_recommendations
+from utils.spotify_api import get_spotify_recommendations
 import pandas as pd
 import time
 import streamlit.components.v1 as components

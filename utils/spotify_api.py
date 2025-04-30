@@ -2,27 +2,20 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import streamlit as st
 
-@st.cache_resource
+# Replace these with your actual Spotify Client ID and Client Secret
+CLIENT_ID = "01c5c4ec250f440e8a434c7cd6fb6dd9"
+CLIENT_SECRET = "481ae17a6f8d43bb8d690a59c2640adb"
+
 def initialize_spotify():
     try:
-        st.write("🔍 Checking Spotify secrets...")
-        st.write("Client ID:", st.secrets["spotify"].get("client_id", "❌ Not found"))
-        st.write("Client Secret:", "●●●●●●●●")  # Hide actual secret
-
-        client_id = st.secrets["spotify"]["client_id"]
-        client_secret = st.secrets["spotify"]["client_secret"]
-
+        # Use hardcoded credentials
         auth_manager = SpotifyClientCredentials(
-            client_id=client_id,
-            client_secret=client_secret
+            client_id=CLIENT_ID,
+            client_secret=CLIENT_SECRET
         )
-        st.success("✅ Spotify API initialized successfully!")
         return spotipy.Spotify(auth_manager=auth_manager)
-    except KeyError as e:
-        st.error(f"❌ Missing key in secrets: {e}")
-        return None
     except Exception as e:
-        st.error(f"❌ Failed to initialize Spotify API: {e}")
+        st.error(f"Failed to initialize Spotify API: {e}")
         return None
 
 @st.cache_data(ttl=3600)

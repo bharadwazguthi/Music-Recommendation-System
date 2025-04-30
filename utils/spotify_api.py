@@ -5,6 +5,10 @@ import streamlit as st
 @st.cache_resource
 def initialize_spotify():
     try:
+        st.write("🔍 Checking Spotify secrets...")
+        st.write("Client ID:", st.secrets["spotify"].get("client_id", "❌ Not found"))
+        st.write("Client Secret:", "●●●●●●●●")  # Hide actual secret
+
         client_id = st.secrets["spotify"]["client_id"]
         client_secret = st.secrets["spotify"]["client_secret"]
 
@@ -12,9 +16,13 @@ def initialize_spotify():
             client_id=client_id,
             client_secret=client_secret
         )
+        st.success("✅ Spotify API initialized successfully!")
         return spotipy.Spotify(auth_manager=auth_manager)
+    except KeyError as e:
+        st.error(f"❌ Missing key in secrets: {e}")
+        return None
     except Exception as e:
-        st.error(f"Failed to initialize Spotify API: {e}")
+        st.error(f"❌ Failed to initialize Spotify API: {e}")
         return None
 
 @st.cache_data(ttl=3600)

@@ -22,7 +22,7 @@ LASTFM_BASE_URL = 'http://ws.audioscrobbler.com/2.0/'
 # App title and description
 st.title('🎵 Music Recommendation Explorer')
 st.markdown("""
-Discover new music based on your favorite songs! Get recommendations from YouTube Music and Spotify (via Last.fm).
+Discover new music based on your favorite songs! Get recommendations from YouTube Music and Spotify.
 """)
 
 # Initialize session state
@@ -160,7 +160,7 @@ def display_lastfm_recommendations(recommendations):
         st.warning("No Spotify recommendations found.")
         return
     
-    st.markdown("### Spotify Recommendations (via Last.fm)")
+    st.markdown("### Spotify Recommendations")
     
     lastfm_data = []
     

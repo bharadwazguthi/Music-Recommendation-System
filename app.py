@@ -3,19 +3,20 @@ from utils.youtube_api import get_youtube_recommendations, initialize_ytmusic
 from utils.spotify_api import get_spotify_recommendations, initialize_spotify
 import pandas as pd
 import streamlit.components.v1 as components
-import time  # Added missing import
+import time
 
-# Set up app
+# Page config
 st.set_page_config(page_title="Music Recommendation System", page_icon="🎵", layout="wide")
 with open("styles/custom_styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 st.title("🎵 Music Recommendation System")
 
-# Initialize APIs
+# Initialize APIs once
 ytmusic = initialize_ytmusic()
 spotify = initialize_spotify()
 
+# Loading spinner
 def custom_loading_spinner():
     spinner_html = """
     <div id="loading-spinner">
@@ -24,11 +25,11 @@ def custom_loading_spinner():
     """
     components.html(spinner_html, height=150)
 
-# Input fields
+# UI
 song_name = st.text_input("Enter a song name:")
 platform_choice = st.radio("Choose Platform:", ["Both", "Spotify Only", "YouTube Music Only"])
 
-# Buttons - only define once
+# Buttons
 search_button = st.button("Get Recommendations")
 clear_button = st.button("Clear All")
 
@@ -49,10 +50,13 @@ if search_button and song_name:
             youtube_recs, error = get_youtube_recommendations(song_name)
             if error:
                 st.error(error)
+            elif not youtube_recs:
+                st.warning("No recommendations found.")
             else:
                 for rec in youtube_recs:
                     st.markdown(f"""
                         <div class="song-card">
+                            <img src="{rec['thumbnail']}" width="100%">
                             <div class="song-title">{rec['title']}</div>
                             <div class="artist-name">{rec['artist']}</div>
                             <a href="{rec['url']}" target="_blank" class="platform-btn youtube-btn">Listen on YouTube Music</a>
@@ -69,10 +73,13 @@ if search_button and song_name:
             spotify_recs, error = get_spotify_recommendations(song_name)
             if error:
                 st.error(error)
+            elif not spotify_recs:
+                st.warning("No recommendations found.")
             else:
                 for rec in spotify_recs:
                     st.markdown(f"""
                         <div class="song-card">
+                            <img src="{rec['thumbnail']}" width="100%">
                             <div class="song-title">{rec['title']}</div>
                             <div class="artist-name">{rec['artist']}</div>
                             <a href="{rec['url']}" target="_blank" class="platform-btn spotify-btn">Listen on Spotify</a>
@@ -84,7 +91,7 @@ if search_button and song_name:
     if combined_recommendations:
         df = pd.DataFrame(combined_recommendations)
         csv = df.to_csv(index=False).encode('utf-8')
-        
+
         st.download_button(
             label="📥 Download Recommendations as CSV",
             data=csv,
@@ -92,6 +99,7 @@ if search_button and song_name:
             mime='text/csv',
         )
 
+# Footer
 st.markdown("""
 <div class="footer">
     Made with ❤️ using Streamlit, Spotify API, and YouTube Music API

@@ -19,7 +19,7 @@ def get_spotify_access_token():
         access_token = response.json()['access_token']
         return access_token
     else:
-        raise Exception("Error fetching access token from Spotify")
+        raise Exception(f"Error fetching access token from Spotify: {response.status_code} - {response.text}")
 
 # Function to get Spotify recommendations based on song name
 def get_spotify_recommendations(song_name):
@@ -40,40 +40,46 @@ def get_spotify_recommendations(song_name):
         }
 
         search_response = requests.get(search_url, headers=headers, params=search_params)
+        
+        # Check if the response was successful
         if search_response.status_code == 200:
-            search_data = search_response.json()
-            if search_data['tracks']['items']:
-                track = search_data['tracks']['items'][0]
-                track_id = track['id']
-                track_name = track['name']
-                track_artist = track['artists'][0]['name']
-                track_url = track['external_urls']['spotify']
-                track_thumbnail = track['album']['images'][0]['url']
+            try:
+                search_data = search_response.json()
+                if search_data['tracks']['items']:
+                    track = search_data['tracks']['items'][0]
+                    track_id = track['id']
+                    track_name = track['name']
+                    track_artist = track['artists'][0]['name']
+                    track_url = track['external_urls']['spotify']
+                    track_thumbnail = track['album']['images'][0]['url']
 
-                # Get recommendations based on the track
-                recs_url = "https://api.spotify.com/v1/recommendations"
-                recs_params = {
-                    "limit": 10,
-                    "seed_tracks": track_id
-                }
-                recs_response = requests.get(recs_url, headers=headers, params=recs_params)
-                
-                if recs_response.status_code == 200:
-                    recs_data = recs_response.json()
-                    recommendations = []
-                    for item in recs_data['tracks']:
-                        recommendations.append({
-                            'title': item['name'],
-                            'artist': item['artists'][0]['name'],
-                            'url': item['external_urls']['spotify'],
-                            'thumbnail': item['album']['images'][0]['url']
-                        })
-                    return recommendations, None
+                    # Get recommendations based on the track
+                    recs_url = "https://api.spotify.com/v1/recommendations"
+                    recs_params = {
+                        "limit": 10,
+                        "seed_tracks": track_id
+                    }
+                    recs_response = requests.get(recs_url, headers=headers, params=recs_params)
+                    
+                    if recs_response.status_code == 200:
+                        recs_data = recs_response.json()
+                        recommendations = []
+                        for item in recs_data['tracks']:
+                            recommendations.append({
+                                'title': item['name'],
+                                'artist': item['artists'][0]['name'],
+                                'url': item['external_urls']['spotify'],
+                                'thumbnail': item['album']['images'][0]['url']
+                            })
+                        return recommendations, None
+                    else:
+                        return [], f"Error fetching recommendations from Spotify: {recs_response.status_code} - {recs_response.text}"
                 else:
-                    return [], "Error fetching recommendations from Spotify"
-            else:
-                return [], "Song not found."
+                    return [], "Song not found."
+            except json.JSONDecodeError as e:
+                return [], f"Error decoding response JSON: {str(e)}"
         else:
-            return [], f"Error: Unable to search for the song. Status code {search_response.status_code}"
+            return [], f"Error: Unable to search for the song. Status code {search_response.status_code} - {search_response.text}"
+    
     except requests.exceptions.RequestException as e:
-        return [], f"Error: {str(e)}"
+        return [], f"Request Error: {str(e)}"

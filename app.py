@@ -19,11 +19,125 @@ def initialize_apis():
 LASTFM_API_KEY = os.getenv('LASTFM_API_KEY') or '75005e0fb82d7a25e27a654fa0809266'
 LASTFM_BASE_URL = 'http://ws.audioscrobbler.com/2.0/'
 
-# App title and description
-st.title('🎵 Music Recommendation Explorer')
+# Custom CSS styling
 st.markdown("""
+<style>
+    .main-header {
+        font-size: 2.5rem;
+        color: #1DB954;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    .platform-header {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    .song-card {
+        background-color: rgba(30, 30, 30, 0.7);
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 10px;
+        color: white;
+    }
+    .song-title {
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: white;
+    }
+    .artist-name {
+        font-style: italic;
+        color: #cccccc;
+    }
+    .platform-btn {
+        display: inline-block;
+        padding: 8px 15px;
+        border-radius: 20px;
+        text-decoration: none;
+        color: white !important;  /* Force white text */
+        font-weight: bold;
+        margin-top: 10px;
+        transition: all 0.3s ease;
+    }
+    .platform-btn:visited {
+        color: white !important;  /* Keep white after click */
+    }
+    .spotify-btn {
+        background-color: #1DB954;
+    }
+    .spotify-btn:hover {
+        background-color: #1ed760;
+        transform: translateY(-2px);
+    }
+    .youtube-btn {
+        background-color: #FF0000;
+    }
+    .youtube-btn:hover {
+        background-color: #ff3333;
+        transform: translateY(-2px);
+    }
+    .stRadio > div {
+        display: flex;
+        justify-content: center;
+    }
+    /* Dark mode styling */
+    .main {
+        background-color: #121212;
+        color: white;
+    }
+    .stButton button {
+        background-color: #1DB954;
+        color: white;
+        font-weight: bold;
+        border-radius: 20px;
+        padding: 8px 16px;
+        border: none;
+    }
+    .stButton button:hover {
+        background-color: #1ed760;
+        transform: translateY(-2px);
+    }
+    .stTextInput > div > div > input {
+        background-color: #333333;
+        color: white;
+        border-radius: 8px;
+    }
+    .stRadio > div {
+        background-color: rgba(30, 30, 30, 0.7);
+        border-radius: 10px;
+        padding: 10px;
+    }
+    .search-header {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+    .divider {
+        border-top: 1px solid #444;
+        margin: 15px 0;
+    }
+    .recommendation-columns {
+        display: flex;
+        gap: 20px;
+    }
+    .recommendation-column {
+        flex: 1;
+    }
+    @media (max-width: 768px) {
+        .recommendation-columns {
+            flex-direction: column;
+        }
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# App title and description
+st.markdown('<div class="main-header">🎵 Music Recommendation System</div>', unsafe_allow_html=True)
+st.markdown("""
+<div style="text-align: center; margin-bottom: 2rem;">
 Discover new music based on your favorite songs! Get recommendations from YouTube Music and Spotify.
-""")
+</div>
+""", unsafe_allow_html=True)
 
 # Initialize session state
 if 'recommendations' not in st.session_state:
@@ -117,23 +231,34 @@ def display_youtube_recommendations(original_song, recommendations):
         st.warning("No YouTube Music results found.")
         return
     
-    st.markdown("### 🎧 You searched for:")
-    st.markdown(f"**{original_song.get('title', 'Unknown Title')}** by **{original_song.get('artists', [{'name': 'Unknown Artist'}])[0]['name']}**")
+    st.markdown('<div class="search-header">🎧 You searched for:</div>', unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="song-card">
+        <div class="song-title">{original_song.get('title', 'Unknown Title')}</div>
+        <div class="artist-name">by {original_song.get('artists', [{'name': 'Unknown Artist'}])[0]['name']}</div>
+    """, unsafe_allow_html=True)
+    
     video_id = original_song.get('videoId', '')
     if video_id:
-        st.markdown(f"[Listen on YouTube Music](https://music.youtube.com/watch?v={video_id})")
+        st.markdown(f'<a href="https://music.youtube.com/watch?v={video_id}" class="platform-btn youtube-btn">Listen on YouTube Music</a>', unsafe_allow_html=True)
     
-    st.markdown("### YouTube Music Recommendations")
+    st.markdown('<div class="platform-header">YouTube Music Recommendations</div>', unsafe_allow_html=True)
     
     yt_data = []
     
     if recommendations:
         for i, track in enumerate(recommendations[:10], 1):
-            st.markdown(f"{i}. **{track.get('title', 'Unknown Title')}** by {track.get('artists', [{'name': 'Unknown Artist'}])[0]['name']}")
+            st.markdown(f"""
+            <div class="song-card">
+                <div class="song-title">{i}. {track.get('title', 'Unknown Title')}</div>
+                <div class="artist-name">by {track.get('artists', [{'name': 'Unknown Artist'}])[0]['name']}</div>
+            """, unsafe_allow_html=True)
+            
             video_id = track.get('videoId', '')
             if video_id:
-                st.markdown(f"[Listen on YouTube Music](https://music.youtube.com/watch?v={video_id})")
-            st.divider()
+                st.markdown(f'<a href="https://music.youtube.com/watch?v={video_id}" class="platform-btn youtube-btn">Listen on YouTube Music</a>', unsafe_allow_html=True)
+            
+            st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
             
             yt_data.append({
                 'Title': track.get('title', 'Unknown'),
@@ -160,14 +285,20 @@ def display_lastfm_recommendations(recommendations):
         st.warning("No Spotify recommendations found.")
         return
     
-    st.markdown("### Spotify Recommendations")
+    st.markdown('<div class="platform-header">Spotify Recommendations </div>', unsafe_allow_html=True)
     
     lastfm_data = []
     
     for i, rec in enumerate(recommendations[:10], 1):
-        st.markdown(f"{i}. **{rec['title']}** by {rec['artist']}")
-        st.markdown(f"[Listen on Spotify]({rec['url']})")
-        st.divider()
+        st.markdown(f"""
+        <div class="song-card">
+            <div class="song-title">{i}. {rec['title']}</div>
+            <div class="artist-name">by {rec['artist']}</div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown(f'<a href="{rec["url"]}" class="platform-btn spotify-btn">Listen on Spotify</a>', unsafe_allow_html=True)
+        
+        st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
         
         lastfm_data.append({
             'Title': rec['title'],
@@ -188,10 +319,12 @@ def display_lastfm_recommendations(recommendations):
 
 # Main app
 with st.form("recommendation_form"):
-    song_name = st.text_input("Enter a song name:", placeholder="e.g., Bohemian Rhapsody")
+    st.markdown('<div class="search-header">Search for a song:</div>', unsafe_allow_html=True)
+    song_name = st.text_input("", placeholder="e.g., Bohemian Rhapsody", label_visibility="collapsed")
     
+    st.markdown('<div class="search-header" style="margin-top: 1rem;">Select platform(s):</div>', unsafe_allow_html=True)
     platform_options = ['Both', 'YouTube Music', 'Spotify']
-    platform = st.radio("Select platform(s):", platform_options, index=0)
+    platform = st.radio("", platform_options, index=0, label_visibility="collapsed")
     
     col1, col2 = st.columns(2)
     with col1:
@@ -218,15 +351,33 @@ if submit_button and song_name:
 
 # Display recommendations
 if st.session_state.recommendations['youtube'] is not None or st.session_state.recommendations['lastfm'] is not None:
-    if platform in ['Both', 'YouTube Music'] and st.session_state.recommendations['youtube']:
-        original_song, youtube_recs = st.session_state.recommendations['youtube']
-        display_youtube_recommendations(original_song, youtube_recs)
-    
-    if platform in ['Both', 'Spotify'] and st.session_state.recommendations['lastfm']:
-        display_lastfm_recommendations(st.session_state.recommendations['lastfm'])
+    if platform == 'Both':
+        # Display side by side for "Both" option
+        st.markdown('<div class="recommendation-columns">', unsafe_allow_html=True)
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.session_state.recommendations['youtube']:
+                original_song, youtube_recs = st.session_state.recommendations['youtube']
+                display_youtube_recommendations(original_song, youtube_recs)
+        
+        with col2:
+            if st.session_state.recommendations['lastfm']:
+                display_lastfm_recommendations(st.session_state.recommendations['lastfm'])
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        # Single column display for individual platforms
+        if platform == 'YouTube Music' and st.session_state.recommendations['youtube']:
+            original_song, youtube_recs = st.session_state.recommendations['youtube']
+            display_youtube_recommendations(original_song, youtube_recs)
+        
+        if platform == 'Spotify' and st.session_state.recommendations['lastfm']:
+            display_lastfm_recommendations(st.session_state.recommendations['lastfm'])
     
     # Combined download option
-    if platform == 'Both' and (st.session_state.recommendations['youtube'] or st.session_state.recommendations['lastfm']):
+    if (st.session_state.recommendations['youtube'] or st.session_state.recommendations['lastfm']):
         all_data = []
         if st.session_state.recommendations['youtube']:
             original_song, youtube_recs = st.session_state.recommendations['youtube']

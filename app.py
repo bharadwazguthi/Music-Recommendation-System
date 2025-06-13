@@ -16,7 +16,7 @@ def initialize_apis():
     return ytmusic
 
 # Last.fm API setup
-LASTFM_API_KEY = os.getenv('LASTFM_API_KEY') or '75005e0fb82d7a25e27a654fa0809266'
+LASTFM_API_KEY = os.getenv('LASTFM_API_KEY') or '9e56e3c9932dbcf9e845a48e4906bcb1'
 LASTFM_BASE_URL = 'http://ws.audioscrobbler.com/2.0/'
 
 # Custom CSS styling

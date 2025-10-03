@@ -105,8 +105,3 @@ Then open your browser at: [http://localhost:8501](http://localhost:8501) 🎉
 Developed with ❤️ by Guthi Bharadwaz ✨
 
 ```
-
----
-
-Do you want me to also clean up your `requirements.txt` in the same plain style so you can drop it into your project directly?
-```

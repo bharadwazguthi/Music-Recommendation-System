@@ -1,7 +1,3 @@
-Got it 👍 I’ll clean it up so there are no `**` or `''` — just plain text with headers, lists, and code blocks.
-
-Here’s your final README.md, copy-paste ready:
-
 ```markdown
 # 🎵 Music Recommendation System  
 
@@ -35,9 +31,9 @@ The app lets you search for a song and discover similar tracks recommended from 
 
 ```
 
-├── app.py             # Main Streamlit app
-├── requirements.txt   # Python dependencies
-├── README.md          # Project documentation
+├── app.py             
+├── requirements.txt   
+├── README.md          
 
 ````
 
